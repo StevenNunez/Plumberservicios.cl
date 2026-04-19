@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #FFD700;
+  --color-primary-hover: #E6C200;
+  --color-black: #111111;
+  --color-slate-bg: #F1F5F9;
+  --color-dark-slate: #1E293B;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-oswald: var(--font-oswald), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --primary: #FFD700;
+  --primary-hover: #E6C200;
+  --black: #111111;
+  --slate-bg: #F1F5F9;
+  --dark-slate: #1E293B;
+}
+
+@layer utilities {
+  .industrial-font {
+    font-family: var(--font-oswald);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+}

@@ -1,0 +1,33 @@
+name: Supabase Keep-Alive
+
+# Corre cada 4 días a las 9:00 AM UTC para evitar la pausa automática
+# del free tier de Supabase (se pausa tras 7 días sin actividad).
+on:
+  schedule:
+    - cron: '0 9 */4 * *'
+  workflow_dispatch: # Permite correrlo manualmente desde GitHub Actions
+
+jobs:
+  ping:
+    name: Ping Supabase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar tabla proyectos
+        run: |
+          response=$(curl --silent --write-out "\n%{http_code}" \
+            "${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}/rest/v1/proyectos?select=id&limit=1" \
+            -H "apikey: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}")
+
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+
+          echo "Status: $http_code"
+          echo "Response: $body"
+
+          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+            echo "❌ Fallo el ping a Supabase (HTTP $http_code)"
+            exit 1
+          fi
+
+          echo "✅ Supabase activo — proyecto no se suspenderá"
