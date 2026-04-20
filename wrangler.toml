@@ -1,7 +1,7 @@
 # Cloudflare Workers — Plumber Servicios
 # Documentación: https://opennext.js.org/cloudflare
 
-name = "plumber-servicios"
+name = "plumberservicios"
 main = ".open-next/worker.js"
 compatibility_date = "2025-04-01"
 compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
@@ -10,6 +10,3 @@ compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 directory = ".open-next/assets"
 binding = "ASSETS"
 
-[[services]]
-binding = "WORKER_SELF_REFERENCE"
-service = "plumber-servicios"
