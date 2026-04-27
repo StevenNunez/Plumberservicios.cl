@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 interface InteractiveLogoProps {
@@ -9,105 +9,103 @@ interface InteractiveLogoProps {
   variant?: 'header' | 'footer-small' | 'footer-giant';
 }
 
-/**
- * InteractiveLogo Component para Teo Labs
- * 
- * Un componente reutilizable que crea un efecto de texto interactivo donde cada letra
- * reacciona a la posición del mouse con movimientos y efectos visuales.
- * 
- * Variantes:
- * - 'header': Texto con gradiente y movimiento sutil (ideal para navegación).
- * - 'footer-small': Versión pequeña con gradiente (ideal para textos legales/copyright).
- * - 'footer-giant': Texto gigante con efecto de aberración cromática (ideal para secciones de impacto).
- */
-export default function InteractiveLogo({ 
-  text = 'Teo Labs', 
-  className, 
-  variant = 'header' 
+export default function InteractiveLogo({
+  text = 'Teo Labs',
+  className,
+  variant = 'header',
 }: InteractiveLogoProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [mouseX, setMouseX] = useState(0.5);
+  const containerRef = useRef<HTMLSpanElement>(null);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      setMouseX((e.clientX - rect.left) / rect.width);
+    }
+  }, []);
+
+  const chars = text.split('');
+  const totalChars = chars.filter((c) => c !== ' ').length;
+
   return (
-    <span className={cn("flex select-none", className)}>
-      {text.split('').map((char, index) => (
-        <AnimatedLetter 
-          key={index} 
-          char={char} 
-          index={index} 
-          variant={variant} 
+    <span
+      ref={containerRef}
+      className={cn('flex select-none', className)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => { setIsHovered(false); setMouseX(0.5); }}
+      onMouseMove={handleMouseMove}
+    >
+      {chars.map((char, index) => (
+        <AnimatedLetter
+          key={index}
+          char={char}
+          index={index}
+          variant={variant}
+          isHovered={isHovered}
+          mouseX={mouseX}
+          totalChars={totalChars}
         />
       ))}
     </span>
   );
 }
 
-function AnimatedLetter({ 
-  char, 
-  index, 
-  variant 
-}: { 
-  char: string; 
-  index: number; 
-  variant: 'header' | 'footer-small' | 'footer-giant' 
+function AnimatedLetter({
+  char,
+  index,
+  variant,
+  isHovered,
+  mouseX,
+  totalChars,
+}: {
+  char: string;
+  index: number;
+  variant: 'header' | 'footer-small' | 'footer-giant';
+  isHovered: boolean;
+  mouseX: number;
+  totalChars: number;
 }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [mouseX, setMouseX] = useState(0);
-  const letterRef = useRef<HTMLSpanElement>(null);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (letterRef.current) {
-      const rect = letterRef.current.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      setMouseX(x);
-    }
-  };
-
   if (char === ' ') {
-    return <span className={cn("inline-block", variant === 'footer-giant' ? "w-[0.3em]" : "w-[0.2em]")} />;
+    return (
+      <span className={cn('inline-block', variant === 'footer-giant' ? 'w-[0.3em]' : 'w-[0.2em]')} />
+    );
   }
 
   const getStyle = (): React.CSSProperties => {
-    // Lógica de transformación basada en la variante
     const intensity = variant === 'footer-giant' ? 8 : 4;
     const skew = variant === 'footer-giant' ? 15 : 10;
-    const transform = isHovered 
-      ? `translateY(${Math.sin(index * 0.5 + mouseX * 3) * intensity}px) skewX(${mouseX * skew}deg)`
+    const centered = mouseX - 0.5; // -0.5 a 0.5
+    const wave = Math.sin(index * 0.5 + centered * 3) * intensity;
+
+    const transform = isHovered
+      ? `translateY(${wave}px) skewX(${centered * skew}deg)`
       : 'translateY(0) skewX(0)';
 
     const style: React.CSSProperties = {
       transform,
-      transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.3s ease-out',
+      transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.35s ease-out',
       fontWeight: isHovered || variant === 'footer-giant' ? '700' : '600',
     };
 
-    // Lógica de sombra (Aberración cromática solo para la versión gigante)
     if (variant === 'footer-giant') {
-      if (isHovered) {
-        style.textShadow = `${-4 - mouseX * 10}px 0 0 rgba(255, 0, 0, 0.6), ${4 - mouseX * 10}px 0 0 rgba(0, 255, 255, 0.6)`;
-      } else {
-        style.textShadow = '-3px 0 0 rgba(255, 0, 0, 0.5), 3px 0 0 rgba(0, 255, 255, 0.5)';
-      }
+      style.textShadow = isHovered
+        ? `${-4 - centered * 10}px 0 0 rgba(255,0,0,0.6), ${4 - centered * 10}px 0 0 rgba(0,255,255,0.6)`
+        : '-3px 0 0 rgba(255,0,0,0.5), 3px 0 0 rgba(0,255,255,0.5)';
     }
 
     return style;
   };
 
-  const getClassName = () => {
-    if (variant === 'footer-giant') {
-      return "inline-block relative cursor-default";
-    }
-    // Clases para el gradiente de Teo Labs
-    return "inline-block relative cursor-default bg-gradient-to-r from-blue-600 via-purple-500 to-green-500 bg-clip-text text-transparent";
-  };
+  void totalChars;
 
   return (
     <span
-      ref={letterRef}
-      className={getClassName()}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setMouseX(0);
-      }}
-      onMouseMove={handleMouseMove}
+      className={cn(
+        'inline-block relative cursor-default',
+        variant !== 'footer-giant' &&
+          'bg-gradient-to-r from-blue-600 via-purple-500 to-green-500 bg-clip-text text-transparent'
+      )}
       style={getStyle()}
     >
       {char}

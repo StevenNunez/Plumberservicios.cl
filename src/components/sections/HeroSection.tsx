@@ -26,7 +26,7 @@ export default function HeroSection() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <a
-              href="https://wa.me/56936256733?text=Hola,%20me%20gustar%C3%ADa%20solicitar%20un%20presupuesto."
+              href="https://wa.me/56952235696?text=Hola,%20me%20gustar%C3%ADa%20solicitar%20un%20presupuesto."
               className="bg-[var(--primary)] text-[var(--black)] px-8 py-3.5 md:px-10 md:py-4 font-bold industrial-font text-base md:text-lg hover:bg-white transition-all shadow-xl text-center"
             >
               Solicitar Presupuesto

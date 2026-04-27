@@ -22,7 +22,7 @@ export default function ProyectosView({ proyectos }: { proyectos: ProyectoDB[] }
           <span className="text-[var(--primary)]">Ejecutados</span>
         </h1>
         <p className="text-base md:text-xl text-gray-600 max-w-2xl leading-relaxed">
-          Nuestra experiencia se traduce en obras concretas. Explorá nuestro portafolio de proyectos
+          Nuestra experiencia se traduce en obras concretas. Explora nuestro portafolio de proyectos
           de gasfitería, urbanización y obras menores, donde la precisión técnica se encuentra con
           la calidad industrial.
         </p>

@@ -72,13 +72,27 @@ interface Props {
 }
 
 export default function ProyectoFormModal({ proyecto, onClose }: Props) {
+  const DEFAULT_PUNTOS = [
+    'Ejecución bajo normas de seguridad industrial.',
+    'Materiales de primera línea certificados.',
+    'Entrega en plazos establecidos.',
+  ];
+
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(proyecto?.imagen_principal ?? '');
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(proyecto?.galeria ?? []);
+  const [galleryFiles, setGalleryFiles] = useState<{ file: File; preview: string }[]>([]);
+  const [puntos, setPuntos] = useState<string[]>(
+    proyecto?.puntos_clave && proyecto.puntos_clave.length > 0
+      ? proyecto.puntos_clave
+      : DEFAULT_PUNTOS
+  );
   const [compressing, setCompressing] = useState(false);
   const [sizeInfo, setSizeInfo] = useState<{ original: number; compressed: number } | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -105,6 +119,25 @@ export default function ProyectoFormModal({ proyecto, onClose }: Props) {
     }
   }
 
+  async function handleGalleryChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+
+    setCompressing(true);
+    try {
+      const compressedFiles = await Promise.all(files.map(f => compressImage(f)));
+      const newItems = compressedFiles.map(f => ({
+        file: f,
+        preview: URL.createObjectURL(f)
+      }));
+      setGalleryFiles(prev => [...prev, ...newItems]);
+    } catch {
+      setError('Error al procesar las imágenes de la galería.');
+    } finally {
+      setCompressing(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
@@ -124,6 +157,18 @@ export default function ProyectoFormModal({ proyecto, onClose }: Props) {
         imagenUrl = uploadResult.url;
       }
 
+      const newGalleryUrls: string[] = [];
+      for (const item of galleryFiles) {
+        const uploadData = new FormData();
+        uploadData.append('file', item.file);
+        const uploadResult = await uploadImagen(uploadData);
+        if ('error' in uploadResult) {
+          setError(`Error subiendo galería: ${uploadResult.error}`);
+          return;
+        }
+        newGalleryUrls.push(uploadResult.url);
+      }
+
       const data = {
         titulo: formData.get('titulo') as string,
         categoria: formData.get('categoria') as string,
@@ -131,6 +176,8 @@ export default function ProyectoFormModal({ proyecto, onClose }: Props) {
         descripcion: formData.get('descripcion') as string,
         descripcion_larga: formData.get('descripcion_larga') as string,
         imagen_principal: imagenUrl,
+        galeria: [...galleryUrls, ...newGalleryUrls],
+        puntos_clave: puntos.filter((p) => p.trim() !== ''),
       };
 
       const result = proyecto?.id
@@ -236,6 +283,54 @@ export default function ProyectoFormModal({ proyecto, onClose }: Props) {
             />
           </div>
 
+          {/* Puntos Clave */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Puntos Clave
+              </label>
+              <button
+                type="button"
+                onClick={() => setPuntos((prev) => [...prev, ''])}
+                className="text-xs text-[var(--primary)] font-bold hover:underline flex items-center gap-1"
+              >
+                <span className="material-symbols-outlined text-sm">add</span>
+                Agregar punto
+              </button>
+            </div>
+            <div className="space-y-2">
+              {puntos.map((punto, idx) => (
+                <div key={idx} className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[var(--primary)] text-base shrink-0">check_circle</span>
+                  <input
+                    type="text"
+                    value={punto}
+                    onChange={(e) =>
+                      setPuntos((prev) =>
+                        prev.map((p, i) => (i === idx ? e.target.value : p))
+                      )
+                    }
+                    className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+                    placeholder="Ej: Ejecución bajo normas de seguridad industrial."
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setPuntos((prev) => prev.filter((_, i) => i !== idx))}
+                    className="text-gray-300 hover:text-red-500 transition-colors shrink-0"
+                    aria-label="Eliminar punto"
+                  >
+                    <span className="material-symbols-outlined text-lg">close</span>
+                  </button>
+                </div>
+              ))}
+              {puntos.length === 0 && (
+                <p className="text-xs text-gray-400 text-center py-2">
+                  Sin puntos clave — haz clic en &quot;Agregar punto&quot; para añadir.
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* Imagen */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -312,6 +407,64 @@ export default function ProyectoFormModal({ proyecto, onClose }: Props) {
               }}
               className="mt-2 w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-gray-500"
             />
+          </div>
+
+          {/* Galería */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Galería de Imágenes (Opcional)
+            </label>
+            <div className="space-y-3">
+              <input
+                ref={galleryRef}
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleGalleryChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                disabled={compressing}
+                onClick={() => galleryRef.current?.click()}
+                className="flex items-center gap-2 border-2 border-dashed border-gray-300 hover:border-[var(--primary)] rounded-lg px-4 py-3 text-sm text-gray-500 hover:text-gray-700 transition-all w-full justify-center disabled:opacity-60"
+              >
+                <span className="material-symbols-outlined text-xl">
+                  {compressing ? 'hourglass_empty' : 'collections'}
+                </span>
+                {compressing ? 'Optimizando galería...' : 'Agregar fotos a la galería'}
+              </button>
+
+              {/* Previews de Galería */}
+              {(galleryUrls.length > 0 || galleryFiles.length > 0) && (
+                <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 mt-4">
+                  {galleryUrls.map((url, i) => (
+                    <div key={url} className="relative aspect-square rounded-lg border overflow-hidden group">
+                      <img src={url} alt={`Galería ${i}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setGalleryUrls(prev => prev.filter((_, idx) => idx !== i))}
+                        className="absolute inset-0 bg-red-500/80 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                      >
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
+                    </div>
+                  ))}
+                  {galleryFiles.map((item, i) => (
+                    <div key={i} className="relative aspect-square rounded-lg border overflow-hidden group">
+                      <img src={item.preview} alt={`Nueva ${i}`} className="w-full h-full object-cover opacity-80" />
+                      <button
+                        type="button"
+                        onClick={() => setGalleryFiles(prev => prev.filter((_, idx) => idx !== i))}
+                        className="absolute inset-0 bg-red-500/80 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                      >
+                        <span className="material-symbols-outlined">delete</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {error && (

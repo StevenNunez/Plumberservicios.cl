@@ -23,8 +23,8 @@ export default function Header() {
         <Link href="/" className="flex items-center">
           <img
             alt="Logo Plumber Servicios SPA"
-            className="h-8 md:h-10 w-auto object-contain"
-            src="/logohe.png "
+            className="h-12 md:h-16 w-auto object-contain mix-blend-lighten"
+            src="/logohe.png"
           />
         </Link>
 
@@ -53,7 +53,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           <a
             className="bg-[var(--primary)] text-[var(--black)] px-3 md:px-5 py-2 rounded-sm font-bold text-xs md:text-sm industrial-font hover:bg-white transition-all text-center leading-tight"
-            href="https://wa.me/56936256733?text=Hola,%20me%20gustar%C3%ADa%20solicitar%20informaci%C3%B3n/presupuesto.%20Vengo%20desde%20https://plumberservicios.cl"
+            href="https://wa.me/56952235696?text=Hola,%20me%20gustar%C3%ADa%20solicitar%20informaci%C3%B3n/presupuesto.%20Vengo%20desde%20https://plumberservicios.cl"
           >
             Presupuesto
           </a>

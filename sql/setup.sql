@@ -14,6 +14,7 @@ create table if not exists proyectos (
   descripcion_larga  text,
   imagen_principal   text not null default '',
   galeria            text[] default '{}',
+  puntos_clave       text[] default '{}',
   created_at  timestamptz default now()
 );
 

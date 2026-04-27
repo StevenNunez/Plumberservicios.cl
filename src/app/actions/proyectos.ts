@@ -12,6 +12,7 @@ export type ProyectoInput = {
   descripcion_larga?: string;
   imagen_principal: string;
   galeria?: string[];
+  puntos_clave?: string[];
 };
 
 export async function crearProyecto(data: ProyectoInput) {
@@ -25,6 +26,7 @@ export async function crearProyecto(data: ProyectoInput) {
     descripcion_larga: data.descripcion_larga,
     imagen_principal: data.imagen_principal,
     galeria: data.galeria ?? [],
+    puntos_clave: data.puntos_clave ?? [],
   });
 
   if (error) return { error: error.message };
@@ -47,6 +49,7 @@ export async function actualizarProyecto(data: ProyectoInput) {
       descripcion_larga: data.descripcion_larga,
       imagen_principal: data.imagen_principal,
       galeria: data.galeria ?? [],
+      puntos_clave: data.puntos_clave ?? [],
     })
     .eq('id', data.id!);
 
