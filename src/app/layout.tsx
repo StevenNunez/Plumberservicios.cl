@@ -30,8 +30,12 @@ export const metadata: Metadata = {
     template: '%s | Plumber Servicios SPA',
   },
   description:
-    'Especialistas en ingeniería hidráulica, alcantarillado, redes de incendio y gasfitería industrial en Los Ángeles, Región del Biobío. Calidad que construye confianza.',
+    'Plumber Servicios SPA: Especialistas en ingeniería hidráulica, alcantarillado, redes de incendio y gasfitería industrial en Los Ángeles, Región del Biobío. Calidad que construye confianza.',
   keywords: [
+    'Plumber Servicios',
+    'Plumber Servicios SPA',
+    'plumberservicios.cl',
+    'plumber servicios cl',
     'gasfitería industrial',
     'alcantarillado',
     'ingeniería hidráulica',

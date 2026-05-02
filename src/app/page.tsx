@@ -7,9 +7,10 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Plumber Servicios SPA",
+    "alternateName": ["Plumber Servicios", "Plumber Servicios cl", "plumberservicios.cl"],
     "description": "Especialistas en ingeniería hidráulica, alcantarillado, salas de bombas y gasfitería industrial en Los Ángeles, Región del Biobío, Chile.",
     "url": "https://plumberservicios.cl",
-    "logo": "https://plumberservicios.cl/logopes.png",
+    "logo": "https://plumberservicios.cl/favicon.png",
     "image": "https://plumberservicios.cl/og-image.png",
     "telephone": "+56936256733",
     "address": {

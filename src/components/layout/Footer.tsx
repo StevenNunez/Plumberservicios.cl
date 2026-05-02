@@ -78,7 +78,9 @@ export default function Footer() {
                 </div>
                 <a
                   className="text-white hover:text-[var(--primary)] transition-colors ml-6 block"
-                  href="tel:+56952235696"
+                  href="https://wa.me/56952235696?text=Hola,%20me%20gustar%C3%ADa%20solicitar%20informaci%C3%B3n/presupuesto.%20Vengo%20desde%20https://plumberservicios.cl"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
                   +56 9 5223 5696
                 </a>
@@ -86,13 +88,15 @@ export default function Footer() {
               <li>
                 <div className="flex items-center gap-2 text-gray-400 mb-1">
                   <span className="material-symbols-outlined text-[var(--primary)] text-sm shrink-0">person</span>
-                  <span>Rafael Ward</span>
+                  <span>Fabián Acuña</span>
                 </div>
                 <a
                   className="text-white hover:text-[var(--primary)] transition-colors ml-6 block"
-                  href="tel:+56999217453"
+                  href="https://wa.me/56979891265?text=Hola,%20me%20gustar%C3%ADa%20solicitar%20informaci%C3%B3n/presupuesto.%20Vengo%20desde%20https://plumberservicios.cl"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  +56 9 9921 7453
+                  +56 9 7989 1265
                 </a>
               </li>
             </ul>
